@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import '../services/prefs_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
+  void _login() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -34,6 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    await PrefsService().saveUsername(username);
+
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => HomeScreen(username: username)),

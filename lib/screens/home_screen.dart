@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'products_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String username;
@@ -13,6 +14,16 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Home'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Profile',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
