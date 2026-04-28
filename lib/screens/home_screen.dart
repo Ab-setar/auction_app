@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'products_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String username;
@@ -36,6 +37,23 @@ class HomeScreen extends StatelessWidget {
                     .textTheme
                     .bodyMedium
                     ?.copyWith(color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProductsScreen()),
+                ),
+                icon: const Icon(Icons.shopping_bag_outlined),
+                label: const Text('Browse Products'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ],
           ),
