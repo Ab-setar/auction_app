@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../services/prefs_service.dart';
 import '../services/notification_service.dart';
+import '../services/fraud_detector.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -41,6 +42,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
 
+    // Fraud check — must happen before committing the bid
+    if (FraudDetector.instance.recordBid()) {
+      _showFraudWarning();
+      return;
+    }
+
     setState(() => _currentBid = bid);
     _bidController.clear();
     PrefsService().saveLastBid(amount: bid, productTitle: widget.product.title);
@@ -49,6 +56,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       amount: bid,
     );
     _showSnackbar('Bid of \$${bid.toStringAsFixed(2)} placed successfully!');
+  }
+
+  void _showFraudWarning() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        icon: const Icon(Icons.warning_amber_rounded,
+            color: Colors.orange, size: 48),
+        title: const Text('Suspicious Activity Detected'),
+        content: const Text(
+          'You are placing bids too quickly. This behaviour has been flagged.\n\n'
+          'Please wait a moment before placing another bid.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Understood'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showSnackbar(String message, {bool isError = false}) {
