@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../services/prefs_service.dart';
+import '../services/notification_service.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -43,6 +44,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     setState(() => _currentBid = bid);
     _bidController.clear();
     PrefsService().saveLastBid(amount: bid, productTitle: widget.product.title);
+    NotificationService.instance.showBidPlaced(
+      productTitle: widget.product.title,
+      amount: bid,
+    );
     _showSnackbar('Bid of \$${bid.toStringAsFixed(2)} placed successfully!');
   }
 
