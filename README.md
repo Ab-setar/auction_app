@@ -138,7 +138,7 @@ build/app/outputs/flutter-apk/app-release.apk
 
 ## 🎥 Presentation Video
 
-👉 Paste your Loom video link here
+
 
 ---
 
