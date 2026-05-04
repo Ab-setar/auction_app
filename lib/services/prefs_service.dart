@@ -7,7 +7,7 @@ class PrefsService {
 
   Future<void> saveUsername(String username) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyUsername, username);
+    await prefs.setString(_keyUserttname, username);
   }
 
   Future<String?> getUsername() async {
