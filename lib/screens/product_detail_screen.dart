@@ -233,7 +233,7 @@ class _InfoRow extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: valueColor ?? Colors.black87,
-              ),0
+              ),
         ),
       ],
     );

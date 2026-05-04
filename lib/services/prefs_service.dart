@@ -4,10 +4,11 @@ class PrefsService {
   static const _keyUsername = 'username';
   static const _keyLastBidAmount = 'last_bid_amount';
   static const _keyLastBidProduct = 'last_bid_product';
+  static const _keyProfileImagePath = 'profile_image_path';
 
   Future<void> saveUsername(String username) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyUserttname, username);
+    await prefs.setString(_keyUsername, username);
   }
 
   Future<String?> getUsername() async {
@@ -35,5 +36,15 @@ class PrefsService {
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+  }
+
+  Future<void> saveProfileImagePath(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyProfileImagePath, path);
+  }
+
+  Future<String?> getProfileImagePath() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyProfileImagePath);
   }
 }

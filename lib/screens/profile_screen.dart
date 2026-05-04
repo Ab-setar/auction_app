@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/prefs_service.dart';
 import 'login_screen.dart';
 
@@ -11,10 +13,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _prefs = PrefsService();
+  final _picker = ImagePicker();
 
   String? _username;
   Map<String, dynamic>? _lastBid;
   bool _loading = true;
+  File? _profileImage;
 
   @override
   void initState() {
@@ -25,11 +29,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadData() async {
     final username = await _prefs.getUsername();
     final lastBid = await _prefs.getLastBid();
+    final imagePath = await _prefs.getProfileImagePath();
     setState(() {
       _username = username;
       _lastBid = lastBid;
+      _profileImage = imagePath != null ? File(imagePath) : null;
       _loading = false;
     });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picked = await _picker.pickImage(
+        source: source,
+        imageQuality: 80,
+        maxWidth: 512,
+      );
+      if (picked == null) return;
+      final file = File(picked.path);
+      await _prefs.saveProfileImagePath(picked.path);
+      setState(() => _profileImage = file);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not access camera/gallery: $e'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
+  void _showImageSourceSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Take a photo'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choose from gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _logout() async {
@@ -64,10 +124,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const CircleAvatar(
-                    radius: 44,
-                    backgroundColor: Colors.deepPurple,
-                    child: Icon(Icons.person, size: 48, color: Colors.white),
+                  GestureDetector(
+                    onTap: _showImageSourceSheet,
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          radius: 44,
+                          backgroundColor: Colors.deepPurple,
+                          backgroundImage: _profileImage != null
+                              ? FileImage(_profileImage!)
+                              : null,
+                          child: _profileImage == null
+                              ? const Icon(Icons.person,
+                                  size: 48, color: Colors.white)
+                              : null,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.deepPurple,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.camera_alt,
+                              size: 16, color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
